@@ -13,21 +13,13 @@ import org.example.entity.Users;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/admin/permission")
-public class PermissionServlet extends HttpServlet {
+public class PermissionServlet extends BaseRBACServlet {
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        Users currentUser = (session != null) ? (Users) session.getAttribute("currentUser") : null;
-        if (currentUser == null) {
-            response.sendRedirect("login");
-            return;
-        }
+    protected void processGet(HttpServletRequest request, HttpServletResponse response, Users currentUser) throws ServletException, IOException {
         RolesDAO rolesDAO = new RolesDAO();
         FeaturesDAO featuresDAO = new FeaturesDAO();
         RoleFeaturesDAO roleFeaturesDAO = new RoleFeaturesDAO();
@@ -35,9 +27,9 @@ public class PermissionServlet extends HttpServlet {
         List<Features> features = featuresDAO.getAll();
         List<RoleFeatures> roleFeatures = roleFeaturesDAO.getAll();
         String message = null;
-        if (session != null) {
-            message = (String) session.getAttribute("permMessage");
-            session.removeAttribute("permMessage");
+        if (request.getSession(false) != null) {
+            message = (String) request.getSession(false).getAttribute("permMessage");
+            request.getSession(false).removeAttribute("permMessage");
         }
         request.setAttribute("roles", roles);
         request.setAttribute("features", features);
@@ -47,13 +39,7 @@ public class PermissionServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        Users currentUser = (session != null) ? (Users) session.getAttribute("currentUser") : null;
-        if (currentUser == null) {
-            response.sendRedirect("login");
-            return;
-        }
+    protected void processPost(HttpServletRequest request, HttpServletResponse response, Users currentUser) throws ServletException, IOException {
         String action = request.getParameter("action");
         int roleId = Integer.parseInt(request.getParameter("role_id"));
         int featureId = Integer.parseInt(request.getParameter("feature_id"));
@@ -67,7 +53,7 @@ public class PermissionServlet extends HttpServlet {
             result = roleFeaturesDAO.delete(roleId, featureId);
             message = result ? "Xoá quyền thành công!" : "Xoá quyền thất bại!";
         }
-        session.setAttribute("permMessage", message);
+        request.getSession().setAttribute("permMessage", message);
         response.sendRedirect(request.getContextPath() + "/admin/permission");
     }
 } 

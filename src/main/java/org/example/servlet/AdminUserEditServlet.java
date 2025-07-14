@@ -11,21 +11,13 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/admin/user-edit")
-public class AdminUserEditServlet extends HttpServlet {
+public class AdminUserEditServlet extends BaseRBACServlet {
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        Users currentUser = (session != null) ? (Users) session.getAttribute("currentUser") : null;
-        if (currentUser == null) {
-            response.sendRedirect("login");
-            return;
-        }
+    protected void processGet(HttpServletRequest request, HttpServletResponse response, Users currentUser) throws ServletException, IOException {
         String idStr = request.getParameter("id");
         if (idStr == null) {
             response.sendRedirect("/admin/users");
@@ -42,13 +34,7 @@ public class AdminUserEditServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        Users currentUser = (session != null) ? (Users) session.getAttribute("currentUser") : null;
-        if (currentUser == null) {
-            response.sendRedirect("login");
-            return;
-        }
+    protected void processPost(HttpServletRequest request, HttpServletResponse response, Users currentUser) throws ServletException, IOException {
         int userId = Integer.parseInt(request.getParameter("user_id"));
         String fullName = request.getParameter("full_name");
         int departmentId = Integer.parseInt(request.getParameter("department_id"));
@@ -68,7 +54,7 @@ public class AdminUserEditServlet extends HttpServlet {
         if (password != null && !password.isEmpty()) {
             if (!password.equals(confirmPassword)) {
                 request.setAttribute("error", "Mật khẩu xác nhận không khớp!");
-                doGet(request, response);
+                processGet(request, response, currentUser);
                 return;
             }
             String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt(12));
@@ -80,7 +66,7 @@ public class AdminUserEditServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/admin/users");
         } else {
             request.setAttribute("error", "Cập nhật thất bại!");
-            doGet(request, response);
+            processGet(request, response, currentUser);
         }
     }
 } 

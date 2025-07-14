@@ -8,24 +8,21 @@ import org.example.entity.Users;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/request/mylr")
-public class MyLeaveRequestsServlet extends HttpServlet {
+public class MyLeaveRequestsServlet extends BaseRBACServlet {
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        Users currentUser = (session != null) ? (Users) session.getAttribute("currentUser") : null;
-        if (currentUser == null) {
-            response.sendRedirect("login");
-            return;
-        }
+    protected void processGet(HttpServletRequest request, HttpServletResponse response, Users currentUser) throws ServletException, IOException {
         LeaveRequestDAO dao = new LeaveRequestDAO();
         List<org.example.entity.LeaveRequests> myRequests = dao.getLeaveRequestsByUserId(currentUser.getUserId());
         request.setAttribute("myRequests", myRequests);
         request.getRequestDispatcher("/my_leave_requests.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void processPost(HttpServletRequest request, HttpServletResponse response, Users currentUser) throws ServletException, IOException {
+        response.sendError(405, "Method Not Allowed");
     }
 } 

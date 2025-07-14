@@ -11,21 +11,13 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/admin/user-add")
-public class AdminUserAddServlet extends HttpServlet {
+public class AdminUserAddServlet extends BaseRBACServlet {
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        Users currentUser = (session != null) ? (Users) session.getAttribute("currentUser") : null;
-        if (currentUser == null) {
-            response.sendRedirect("login");
-            return;
-        }
+    protected void processGet(HttpServletRequest request, HttpServletResponse response, Users currentUser) throws ServletException, IOException {
         DepartmentsDAO departmentsDAO = new DepartmentsDAO();
         List<Departments> departments = departmentsDAO.getAllDepartments();
         request.setAttribute("departments", departments);
@@ -33,13 +25,7 @@ public class AdminUserAddServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        Users currentUser = (session != null) ? (Users) session.getAttribute("currentUser") : null;
-        if (currentUser == null) {
-            response.sendRedirect("login");
-            return;
-        }
+    protected void processPost(HttpServletRequest request, HttpServletResponse response, Users currentUser) throws ServletException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String fullName = request.getParameter("full_name");
@@ -60,7 +46,7 @@ public class AdminUserAddServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/admin/users");
         } else {
             request.setAttribute("error", "Thêm nhân viên thất bại!");
-            doGet(request, response);
+            processGet(request, response, currentUser);
         }
     }
 } 
