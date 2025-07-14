@@ -7,6 +7,7 @@
     }
     boolean isAdmin = "admin".equalsIgnoreCase(currentUser.getUsername());
     java.util.List<org.example.entity.Features> features = (java.util.List<org.example.entity.Features>) session.getAttribute("features");
+    String contextPath = request.getContextPath();
 %>
 <!DOCTYPE html>
 <html>
@@ -14,6 +15,11 @@
     <title>Trang chủ - Leave Management</title>
 </head>
 <body>
+    <% String successMessage = (String) session.getAttribute("successMessage");
+       if (successMessage != null) { %>
+        <div style="color: green; font-weight: bold;"> <%= successMessage %> </div>
+        <% session.removeAttribute("successMessage"); %>
+    <% } %>
     <h2>Xin chào, <%= currentUser.getFullName() %>!</h2>
     <p>Tên đăng nhập: <%= currentUser.getUsername() %></p>
     <p>Email: <%= currentUser.getEmail() %></p>
@@ -21,11 +27,11 @@
     <h3>Các chức năng bạn có thể sử dụng:</h3>
     <ul>
         <% if (isAdmin) { %>
-            <li><a href="/admin/users.jsp">Quản lý người dùng</a></li>
-            <li><a href="/admin/roles.jsp">Quản lý phân quyền</a></li>
+            <li><a href="<%= contextPath %>/admin/users.jsp">Quản lý người dùng</a></li>
+            <li><a href="<%= contextPath %>/admin/roles.jsp">Quản lý phân quyền</a></li>
         <% } else if (features != null) {
             for (org.example.entity.Features f : features) { %>
-                <li><a href="<%= f.getEntrypoint() %>"><%= f.getFeatureName() %></a></li>
+                <li><a href="<%= contextPath + f.getEntrypoint() %>"><%= f.getFeatureName() %></a></li>
         <%  }
            } else { %>
             <li>Không có chức năng nào khả dụng.</li>
