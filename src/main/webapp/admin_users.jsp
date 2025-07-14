@@ -1,47 +1,50 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ include file="layout.jsp" %>
 <%
     org.example.entity.Users currentUser = (org.example.entity.Users) session.getAttribute("currentUser");
-    if (currentUser == null) {
-        response.sendRedirect("login");
-        return;
-    }
     String contextPath = request.getContextPath();
     java.util.List<org.example.entity.Users> users = (java.util.List<org.example.entity.Users>) request.getAttribute("users");
 %>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Quản lý người dùng</title>
-</head>
-<body>
-    <h2>Quản lý người dùng</h2>
-    <a href="<%= contextPath %>/admin/user-add">Thêm nhân viên</a>
-    <br><br>
-    <table border="1" cellpadding="5" cellspacing="0">
-        <tr>
-            <th>ID</th>
-            <th>Username</th>
-            <th>Họ tên</th>
-            <th>Phòng ban</th>
-            <th>Email</th>
-            <th>Chức năng</th>
-        </tr>
-        <% if (users != null && !users.isEmpty()) {
-            for (org.example.entity.Users u : users) { %>
+<div class="row justify-content-center">
+    <div class="col-lg-10 col-md-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="mb-0">Quản lý nhân viên</h2>
+            <a href="<%= contextPath %>/admin/user-add" class="btn btn-success">+ Thêm nhân viên</a>
+        </div>
+        <div class="table-responsive shadow-sm">
+            <table class="table table-bordered table-hover align-middle bg-white">
+                <thead class="table-primary">
                 <tr>
-                    <td><%= u.getUserId() %></td>
-                    <td><%= u.getUsername() %></td>
-                    <td><%= u.getFullName() %></td>
-                    <td><%= u.getDepartmentId() %></td>
-                    <td><%= u.getEmail() %></td>
-                    <td><a href="<%= contextPath %>/admin/user-edit?id=<%= u.getUserId() %>">Chỉnh sửa</a></td>
+                    <th scope="col">ID</th>
+                    <th scope="col">Username</th>
+                    <th scope="col">Họ tên</th>
+                    <th scope="col">Phòng ban</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Chức năng</th>
                 </tr>
-        <%  }
-           } else { %>
-            <tr><td colspan="6">Không có người dùng nào.</td></tr>
-        <% } %>
-    </table>
-    <br>
-    <a href="<%= contextPath %>/home">Quay lại trang chủ</a>
-</body>
-</html> 
+                </thead>
+                <tbody>
+                <% if (users != null && !users.isEmpty()) {
+                    for (org.example.entity.Users u : users) { %>
+                        <tr>
+                            <td><%= u.getUserId() %></td>
+                            <td><%= u.getUsername() %></td>
+                            <td><%= u.getFullName() %></td>
+                            <td><%= u.getDepartmentId() %></td>
+                            <td><%= u.getEmail() %></td>
+                            <td>
+                                <a href="<%= contextPath %>/admin/user-edit?id=<%= u.getUserId() %>" class="btn btn-sm btn-outline-primary">Chỉnh sửa</a>
+                            </td>
+                        </tr>
+                <%  }
+                   } else { %>
+                    <tr><td colspan="6" class="text-center text-muted">Không có nhân viên nào.</td></tr>
+                <% } %>
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-3">
+            <a href="<%= contextPath %>/home" class="btn btn-secondary">&larr; Quay lại trang chủ</a>
+        </div>
+    </div>
+</div> 
