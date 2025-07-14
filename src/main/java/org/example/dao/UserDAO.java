@@ -59,4 +59,29 @@ public class UserDAO {
         }
         return null;
     }
+
+    public java.util.List<org.example.entity.Features> getFeaturesByUserId(int userId) {
+        java.util.List<org.example.entity.Features> features = new java.util.ArrayList<>();
+        String sql = "SELECT DISTINCT f.feature_id, f.feature_name, f.entrypoint " +
+                "FROM Features f " +
+                "JOIN Role_Features rf ON f.feature_id = rf.feature_id " +
+                "JOIN User_Roles ur ON rf.role_id = ur.role_id " +
+                "WHERE ur.user_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    org.example.entity.Features f = new org.example.entity.Features();
+                    f.setFeatureId(rs.getInt("feature_id"));
+                    f.setFeatureName(rs.getString("feature_name"));
+                    f.setEntrypoint(rs.getString("entrypoint"));
+                    features.add(f);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return features;
+    }
 } 

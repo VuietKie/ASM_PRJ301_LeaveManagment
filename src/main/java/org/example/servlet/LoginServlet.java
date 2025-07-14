@@ -32,11 +32,11 @@ public class LoginServlet extends HttpServlet {
             if (match) {
                 HttpSession session = request.getSession();
                 session.setAttribute("currentUser", existingUser);
-                if ("admin".equalsIgnoreCase(existingUser.getUsername())) {
-                    response.sendRedirect("admin/users.jsp");
-                } else {
-                    response.sendRedirect("home.jsp");
-                }
+                // Lấy danh sách feature theo RBAC
+                java.util.List<org.example.entity.Features> features = userDAO.getFeaturesByUserId(existingUser.getUserId());
+                session.setAttribute("features", features);
+                // Chuyển hướng tất cả user (kể cả admin) sang /home
+                response.sendRedirect("home");
                 return;
             }
         }
