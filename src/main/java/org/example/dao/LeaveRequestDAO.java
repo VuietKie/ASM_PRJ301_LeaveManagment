@@ -161,4 +161,34 @@ public class LeaveRequestDAO {
         }
         return list;
     }
+
+    public java.util.List<org.example.entity.LeaveRequests> getLeaveRequestsInRange(java.sql.Date from, java.sql.Date to) {
+        java.util.List<org.example.entity.LeaveRequests> list = new java.util.ArrayList<>();
+        String sql = "SELECT * FROM Leave_Requests WHERE end_date >= ? AND start_date <= ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setDate(1, from);
+            ps.setDate(2, to);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    org.example.entity.LeaveRequests lr = new org.example.entity.LeaveRequests();
+                    lr.setRequestId(rs.getInt("request_id"));
+                    lr.setUserId(rs.getInt("user_id"));
+                    lr.setStartDate(rs.getDate("start_date"));
+                    lr.setEndDate(rs.getDate("end_date"));
+                    lr.setReason(rs.getString("reason"));
+                    lr.setStatus(rs.getString("status"));
+                    lr.setProcessedBy(rs.getObject("processed_by") != null ? rs.getInt("processed_by") : null);
+                    lr.setProcessedReason(rs.getString("processed_reason"));
+                    lr.setCreatedAt(rs.getTimestamp("created_at"));
+                    lr.setUpdatedAt(rs.getTimestamp("updated_at"));
+                    lr.setTitle(rs.getString("title"));
+                    list.add(lr);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 } 

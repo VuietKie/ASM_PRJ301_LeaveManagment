@@ -5,7 +5,6 @@
         response.sendRedirect("login");
         return;
     }
-    boolean isAdmin = "admin".equalsIgnoreCase(currentUser.getUsername());
     java.util.List<org.example.entity.Features> features = (java.util.List<org.example.entity.Features>) session.getAttribute("features");
     String contextPath = request.getContextPath();
 %>
@@ -26,10 +25,7 @@
     <p>Phòng ban: <%= currentUser.getDepartmentId() %></p>
     <h3>Các chức năng bạn có thể sử dụng:</h3>
     <ul>
-        <% if (isAdmin) { %>
-            <li><a href="<%= contextPath %>/admin/users.jsp">Quản lý người dùng</a></li>
-            <li><a href="<%= contextPath %>/admin/roles.jsp">Quản lý phân quyền</a></li>
-        <% } else if (features != null) {
+        <% if (features != null) {
             for (org.example.entity.Features f : features) { %>
                 <li><a href="<%= contextPath + f.getEntrypoint() %>"><%= f.getFeatureName() %></a></li>
         <%  }
