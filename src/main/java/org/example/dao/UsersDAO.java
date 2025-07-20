@@ -116,4 +116,44 @@ public class UsersDAO {
         }
         return false;
     }
+
+    public int countAllUsers() {
+        String sql = "SELECT COUNT(*) FROM Users";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public List<Users> getUsersByPage(int page, int pageSize) {
+        List<Users> list = new ArrayList<>();
+        String sql = "SELECT * FROM Users ORDER BY user_id OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            int offset = (page - 1) * pageSize;
+            ps.setInt(1, offset);
+            ps.setInt(2, pageSize);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Users user = new Users();
+                    user.setUserId(rs.getInt("user_id"));
+                    user.setUsername(rs.getString("username"));
+                    user.setFullName(rs.getString("full_name"));
+                    user.setDepartmentId(rs.getInt("department_id"));
+                    user.setManagerId(rs.getObject("manager_id") != null ? rs.getInt("manager_id") : null);
+                    user.setEmail(rs.getString("email"));
+                    list.add(user);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 } 

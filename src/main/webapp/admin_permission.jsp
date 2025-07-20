@@ -40,6 +40,7 @@
                         <button type="submit" name="action" value="add" class="btn btn-primary">Thêm quyền</button>
                     </div>
                 </form>
+                <div id="toppagger" class="pagger my-3"></div>
                 <div class="table-responsive">
                     <table class="table table-bordered table-hover align-middle bg-white">
                         <thead class="table-primary">
@@ -73,10 +74,17 @@
                         </tbody>
                     </table>
                 </div>
+                <div id="botpagger" class="pagger my-3"></div>
                 <div class="mt-3">
                     <a href="<%= request.getContextPath() %>/home" class="btn btn-secondary">&larr; Quay lại trang chủ</a>
                 </div>
             </div>
         </div>
     </div>
-</div> 
+</div>
+<script src="../static/js/pagger.js" type="text/javascript"></script>
+<link href="../static/css/pagger.css" rel="stylesheet" type="text/css"/>
+<script>
+    pagger_init('toppagger', ${pageindex}, ${totalpage}, 2);
+    pagger_init('botpagger', ${pageindex}, ${totalpage}, 2);
+</script> 

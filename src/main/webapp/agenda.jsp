@@ -73,6 +73,8 @@
                         <button type="submit" class="btn btn-primary">Xem lịch</button>
                     </div>
                 </form>
+                <%-- Sau form lọc, trước bảng --%>
+                <div id="toppagger" class="pagger my-3"></div>
                 <% if (from != null && to != null && filteredUsers != null && !filteredUsers.isEmpty()) { %>
                 <div class="table-responsive">
                     <table class="table table-bordered table-hover align-middle bg-white">
@@ -129,6 +131,7 @@
                         </tbody>
                     </table>
                 </div>
+                <div id="botpagger" class="pagger my-3"></div>
                 <% } else if (from != null && to != null) { %>
                     <div class="alert alert-info mt-3">Không có nhân viên nào nghỉ phép trong khoảng này.</div>
                 <% } %>
@@ -138,4 +141,10 @@
             </div>
         </div>
     </div>
-</div> 
+</div>
+<script src="../static/js/pagger.js" type="text/javascript"></script>
+<link href="../static/css/pagger.css" rel="stylesheet" type="text/css"/>
+<script>
+    pagger_init('toppagger', ${pageindex}, ${totalpage}, 2);
+    pagger_init('botpagger', ${pageindex}, ${totalpage}, 2);
+</script> 

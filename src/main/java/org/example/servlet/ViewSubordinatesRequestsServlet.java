@@ -15,8 +15,18 @@ public class ViewSubordinatesRequestsServlet extends BaseRBACServlet {
     @Override
     protected void processGet(HttpServletRequest request, HttpServletResponse response, Users currentUser) throws ServletException, IOException {
         LeaveRequestDAO dao = new LeaveRequestDAO();
-        java.util.List<org.example.entity.LeaveRequests> subRequests = dao.getLeaveRequestsOfDepartment(currentUser.getDepartmentId(), currentUser.getUserId());
+        int pageSize = 5;
+        int pageindex = 1;
+        String pageParam = request.getParameter("page");
+        if (pageParam != null) {
+            try { pageindex = Integer.parseInt(pageParam); } catch (Exception ignored) {}
+        }
+        int totalRecords = dao.countLeaveRequestsOfDepartment(currentUser.getDepartmentId(), currentUser.getUserId());
+        int totalpage = (int) Math.ceil(totalRecords * 1.0 / pageSize);
+        java.util.List<org.example.entity.LeaveRequests> subRequests = dao.getLeaveRequestsOfDepartmentPaged(currentUser.getDepartmentId(), currentUser.getUserId(), pageindex, pageSize);
         request.setAttribute("subRequests", subRequests);
+        request.setAttribute("pageindex", pageindex);
+        request.setAttribute("totalpage", totalpage);
         request.getRequestDispatcher("/view_subordinates_requests.jsp").forward(request, response);
     }
 

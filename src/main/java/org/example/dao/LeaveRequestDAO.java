@@ -191,4 +191,102 @@ public class LeaveRequestDAO {
         }
         return list;
     }
+
+    public int countLeaveRequestsByUserId(int userId) {
+        String sql = "SELECT COUNT(*) FROM Leave_Requests WHERE user_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public java.util.List<org.example.entity.LeaveRequests> getLeaveRequestsByUserIdPaged(int userId, int page, int pageSize) {
+        java.util.List<org.example.entity.LeaveRequests> list = new java.util.ArrayList<>();
+        String sql = "SELECT * FROM Leave_Requests WHERE user_id = ? ORDER BY created_at DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            int offset = (page - 1) * pageSize;
+            ps.setInt(1, userId);
+            ps.setInt(2, offset);
+            ps.setInt(3, pageSize);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    org.example.entity.LeaveRequests lr = new org.example.entity.LeaveRequests();
+                    lr.setRequestId(rs.getInt("request_id"));
+                    lr.setUserId(rs.getInt("user_id"));
+                    lr.setStartDate(rs.getDate("start_date"));
+                    lr.setEndDate(rs.getDate("end_date"));
+                    lr.setReason(rs.getString("reason"));
+                    lr.setStatus(rs.getString("status"));
+                    lr.setProcessedBy(rs.getObject("processed_by") != null ? rs.getInt("processed_by") : null);
+                    lr.setProcessedReason(rs.getString("processed_reason"));
+                    lr.setCreatedAt(rs.getTimestamp("created_at"));
+                    lr.setUpdatedAt(rs.getTimestamp("updated_at"));
+                    lr.setTitle(rs.getString("title"));
+                    list.add(lr);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public int countLeaveRequestsOfDepartment(int departmentId, int excludeUserId) {
+        String sql = "SELECT COUNT(*) FROM Leave_Requests lr JOIN Users u ON lr.user_id = u.user_id WHERE u.department_id = ? AND lr.user_id <> ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, departmentId);
+            ps.setInt(2, excludeUserId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public java.util.List<org.example.entity.LeaveRequests> getLeaveRequestsOfDepartmentPaged(int departmentId, int excludeUserId, int page, int pageSize) {
+        java.util.List<org.example.entity.LeaveRequests> list = new java.util.ArrayList<>();
+        String sql = "SELECT lr.* FROM Leave_Requests lr JOIN Users u ON lr.user_id = u.user_id WHERE u.department_id = ? AND lr.user_id <> ? ORDER BY lr.created_at DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            int offset = (page - 1) * pageSize;
+            ps.setInt(1, departmentId);
+            ps.setInt(2, excludeUserId);
+            ps.setInt(3, offset);
+            ps.setInt(4, pageSize);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    org.example.entity.LeaveRequests lr = new org.example.entity.LeaveRequests();
+                    lr.setRequestId(rs.getInt("request_id"));
+                    lr.setUserId(rs.getInt("user_id"));
+                    lr.setStartDate(rs.getDate("start_date"));
+                    lr.setEndDate(rs.getDate("end_date"));
+                    lr.setReason(rs.getString("reason"));
+                    lr.setStatus(rs.getString("status"));
+                    lr.setProcessedBy(rs.getObject("processed_by") != null ? rs.getInt("processed_by") : null);
+                    lr.setProcessedReason(rs.getString("processed_reason"));
+                    lr.setCreatedAt(rs.getTimestamp("created_at"));
+                    lr.setUpdatedAt(rs.getTimestamp("updated_at"));
+                    lr.setTitle(rs.getString("title"));
+                    list.add(lr);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 } 

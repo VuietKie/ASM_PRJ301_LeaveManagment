@@ -16,8 +16,18 @@ public class AdminUsersServlet extends BaseRBACServlet {
     @Override
     protected void processGet(HttpServletRequest request, HttpServletResponse response, Users currentUser) throws ServletException, IOException {
         UsersDAO usersDAO = new UsersDAO();
-        List<Users> users = usersDAO.getAllUsers();
+        int pageSize = 5;
+        int pageindex = 1;
+        String pageParam = request.getParameter("page");
+        if (pageParam != null) {
+            try { pageindex = Integer.parseInt(pageParam); } catch (Exception ignored) {}
+        }
+        int totalRecords = usersDAO.countAllUsers();
+        int totalpage = (int) Math.ceil(totalRecords * 1.0 / pageSize);
+        List<Users> users = usersDAO.getUsersByPage(pageindex, pageSize);
         request.setAttribute("users", users);
+        request.setAttribute("pageindex", pageindex);
+        request.setAttribute("totalpage", totalpage);
         request.getRequestDispatcher("/admin_users.jsp").forward(request, response);
     }
 

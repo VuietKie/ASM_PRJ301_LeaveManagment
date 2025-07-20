@@ -23,9 +23,17 @@ public class PermissionServlet extends BaseRBACServlet {
         RolesDAO rolesDAO = new RolesDAO();
         FeaturesDAO featuresDAO = new FeaturesDAO();
         RoleFeaturesDAO roleFeaturesDAO = new RoleFeaturesDAO();
+        int pageSize = 5;
+        int pageindex = 1;
+        String pageParam = request.getParameter("page");
+        if (pageParam != null) {
+            try { pageindex = Integer.parseInt(pageParam); } catch (Exception ignored) {}
+        }
+        int totalRecords = roleFeaturesDAO.countAll();
+        int totalpage = (int) Math.ceil(totalRecords * 1.0 / pageSize);
         List<Roles> roles = rolesDAO.getAll();
         List<Features> features = featuresDAO.getAll();
-        List<RoleFeatures> roleFeatures = roleFeaturesDAO.getAll();
+        List<RoleFeatures> roleFeatures = roleFeaturesDAO.getByPage(pageindex, pageSize);
         String message = null;
         if (request.getSession(false) != null) {
             message = (String) request.getSession(false).getAttribute("permMessage");
@@ -35,6 +43,8 @@ public class PermissionServlet extends BaseRBACServlet {
         request.setAttribute("features", features);
         request.setAttribute("roleFeatures", roleFeatures);
         request.setAttribute("message", message);
+        request.setAttribute("pageindex", pageindex);
+        request.setAttribute("totalpage", totalpage);
         request.getRequestDispatcher("/admin_permission.jsp").forward(request, response);
     }
 
